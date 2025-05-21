@@ -5,20 +5,18 @@ import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ExternalLink, Palette, Shirt, Sparkles } from 'lucide-react';
-import type { RelevantProductSchema } from '@/ai/flows/analyze-search-results';
+import { ExternalLink, Shirt, Sparkles } from 'lucide-react';
+import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
 import type { ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
-import type { z } from 'zod';
 
-type Product = z.infer<typeof RelevantProductSchema>;
 
 interface StyleAdviceDisplayProps {
-  originalProduct: Product;
+  originalProduct: RelevantProduct;
   advice: ProvideStylingAdviceOutput;
 }
 
 export function StyleAdviceDisplay({ originalProduct, advice }: StyleAdviceDisplayProps) {
-  const placeholderImage = "https://placehold.co/400x533.png"; // Portrait aspect ratio
+  const placeholderImage = "https://placehold.co/400x533.png"; 
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-start">

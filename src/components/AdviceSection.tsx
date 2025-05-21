@@ -4,14 +4,12 @@
 import { StyleAdviceDisplay } from "./StyleAdviceDisplay";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import type { RelevantProductSchema } from '@/ai/flows/analyze-search-results';
+import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
 import type { ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
-import type { z } from 'zod';
 
-type Product = z.infer<typeof RelevantProductSchema>;
 
 interface AdviceSectionProps {
-  product: Product;
+  product: RelevantProduct;
   advice: ProvideStylingAdviceOutput;
   onResetToInput: () => void;
   onResetToResults: () => void;

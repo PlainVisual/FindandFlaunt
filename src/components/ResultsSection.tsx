@@ -3,15 +3,14 @@
 
 import { ProductCard } from "./ProductCard";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, SearchAgainIcon } from "lucide-react"; // Using SearchAgainIcon (assuming it exists or custom)
-import type { AnalyzeSearchResultsOutput, RelevantProductSchema } from '@/ai/flows/analyze-search-results';
-import type { z } from 'zod';
+import { ArrowLeft } from "lucide-react";
+import type { AnalyzeSearchResultsOutput } from '@/ai/flows/analyze-search-results';
+import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
 
-type Product = z.infer<typeof RelevantProductSchema>;
 
 interface ResultsSectionProps {
   products: AnalyzeSearchResultsOutput;
-  onSelectProduct: (product: Product) => void;
+  onSelectProduct: (product: RelevantProduct) => void;
   onReset: () => void;
   isLoadingAdvice: boolean;
   selectedProductId?: string | null;
@@ -41,10 +40,9 @@ export function ResultsSection({ products, onSelectProduct, onReset, isLoadingAd
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {products.map((product, index) => (
-          // Ensure productUrl is present for key, if not, use index as fallback but log warning
           <ProductCard 
             key={product.productUrl || `product-${index}`} 
-            product={product as Product} // Cast as Product type
+            product={product as RelevantProduct} 
             onGetAdvice={onSelectProduct}
             isLoadingAdvice={isLoadingAdvice}
             selectedProductId={selectedProductId}

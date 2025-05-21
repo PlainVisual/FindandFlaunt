@@ -1,14 +1,15 @@
 // @/app/actions.ts
 "use server";
 
-import { analyzeSearchResults, type AnalyzeSearchResults_FlowInput, type AnalyzeSearchResultsOutput, RelevantProductSchema } from "@/ai/flows/analyze-search-results";
+import { analyzeSearchResults, type AnalyzeSearchResults_FlowInput, type AnalyzeSearchResultsOutput } from "@/ai/flows/analyze-search-results";
 import { provideStylingAdvice, type ProvideStylingAdviceInput, type ProvideStylingAdviceOutput } from "@/ai/flows/provide-styling-advice";
+import { RelevantProductSchema } from '@/lib/schemas'; // Updated import path
 import { z } from "zod";
 
 // Helper to validate results from AI flow for analyzeSearchResults
 const SafeAnalyzeSearchResultsOutputSchema = z.array(RelevantProductSchema.partial().extend({
-  relevanceScore: z.number().min(0).max(1).default(0.5), // Ensure score is always present
-  imageUrl: z.string().url().optional().or(z.literal("")), // Allow empty string or valid URL
+  relevanceScore: z.number().min(0).max(1).default(0.5),
+  imageUrl: z.string().url().optional().or(z.literal("")), 
   title: z.string().default("Untitled Product"),
   description: z.string().default("No description available."),
   price: z.string().default("Price not specified"),
@@ -18,11 +19,9 @@ const SafeAnalyzeSearchResultsOutputSchema = z.array(RelevantProductSchema.parti
 
 export async function performSearch(input: AnalyzeSearchResults_FlowInput): Promise<AnalyzeSearchResultsOutput | { error: string }> {
   try {
-    // Validate required inputs for the new schema (searchResultsHtml is no longer part of input)
-    if (!input.clothingItem) { // Color preference can be optional if logic allows
+    if (!input.clothingItem) {
       return { error: "Clothing Item is required." };
     }
-    // Removed validation for input.searchResultsHtml.length
 
     const results = await analyzeSearchResults(input);
     
@@ -62,8 +61,8 @@ export async function getStylingAdvice(input: ProvideStylingAdviceInput): Promis
     if (!input.clothingItem || !input.colorPreference || !input.itemDescription || !input.itemImageUrl) {
         return { error: "All product details (clothing item, color, description, image URL) are required for styling advice." };
     }
-     if (!input.itemImageUrl.startsWith('http://') && !input.itemImageUrl.startsWith('https://')) {
-        return { error: "Invalid item image URL provided for styling advice. It must start with http:// or https://." };
+     if (!input.itemImageUrl.startsWith('http://') && !input.itemImageUrl.startsWith('https://') && !input.itemImageUrl.startsWith('data:')) { // Added data:
+        return { error: "Invalid item image URL provided for styling advice. It must start with http://, https://, or data:." };
     }
 
     const advice = await provideStylingAdvice(input);

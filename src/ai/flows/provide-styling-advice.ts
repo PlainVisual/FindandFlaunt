@@ -1,4 +1,4 @@
-// use server'
+'use server';
 
 /**
  * @fileOverview Provides styling advice based on clothing items and color preferences.
@@ -75,4 +75,3 @@ const provideStylingAdviceFlow = ai.defineFlow(
     };
   }
 );
-

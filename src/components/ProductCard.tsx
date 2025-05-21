@@ -5,23 +5,20 @@ import Image from 'next/image';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, ShoppingCart, Shirt } from 'lucide-react'; // Added Shirt for placeholder
-import type { RelevantProductSchema } from '@/ai/flows/analyze-search-results'; // Use the specific product type
-import type { z } from 'zod';
+import { Star } from 'lucide-react';
+import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
 
-// Infer the type from the Zod schema for a single product
-type Product = z.infer<typeof RelevantProductSchema>;
 
 interface ProductCardProps {
-  product: Product;
-  onGetAdvice: (product: Product) => void;
+  product: RelevantProduct;
+  onGetAdvice: (product: RelevantProduct) => void;
   isLoadingAdvice: boolean;
   selectedProductId?: string | null;
 }
 
 export function ProductCard({ product, onGetAdvice, isLoadingAdvice, selectedProductId }: ProductCardProps) {
   const placeholderImage = "https://placehold.co/300x400.png";
-  const isThisCardLoading = isLoadingAdvice && selectedProductId === product.productUrl; // Assuming productUrl is unique enough for ID
+  const isThisCardLoading = isLoadingAdvice && selectedProductId === product.productUrl;
 
   return (
     <Card className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 h-full">
@@ -59,7 +56,7 @@ export function ProductCard({ product, onGetAdvice, isLoadingAdvice, selectedPro
         <Button 
           onClick={() => onGetAdvice(product)} 
           className="w-full"
-          disabled={isThisCardLoading || !product.productUrl} // Disable if no product URL
+          disabled={isThisCardLoading || !product.productUrl}
         >
           {isThisCardLoading ? (
             <>
@@ -77,4 +74,3 @@ export function ProductCard({ product, onGetAdvice, isLoadingAdvice, selectedPro
     </Card>
   );
 }
-

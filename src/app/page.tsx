@@ -9,19 +9,19 @@ import { ResultsSection } from "@/components/ResultsSection";
 import { AdviceSection } from "@/components/AdviceSection";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { performSearch, getStylingAdvice } from './actions';
-import type { AnalyzeSearchResults_FlowInput, AnalyzeSearchResultsOutput, RelevantProductSchema } from '@/ai/flows/analyze-search-results';
+import type { AnalyzeSearchResults_FlowInput, AnalyzeSearchResultsOutput } from '@/ai/flows/analyze-search-results';
+import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
 import type { ProvideStylingAdviceInput, ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
 import type { SearchFormValues } from '@/lib/schemas';
 import { useToast } from "@/hooks/use-toast";
-import type { z } from 'zod';
 
-type Product = z.infer<typeof RelevantProductSchema>;
+
 type AppStep = 'input' | 'results' | 'advice';
 
 export default function StyleSavvyShopperPage() {
   const [step, setStep] = useState<AppStep>('input');
   const [analyzedProducts, setAnalyzedProducts] = useState<AnalyzeSearchResultsOutput>([]);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<RelevantProduct | null>(null);
   
   const [currentClothingItem, setCurrentClothingItem] = useState<string>("");
   const [currentColorPreference, setCurrentColorPreference] = useState<string>("");
@@ -47,12 +47,11 @@ export default function StyleSavvyShopperPage() {
     setAnalyzedProducts([]); 
 
     setCurrentClothingItem(values.clothingItem); 
-    setCurrentColorPreference(values.colorPreference); 
+    setCurrentColorPreference(values.colorPreference || ""); 
 
-    // searchResultsHtml is no longer passed from the form
     const searchInput: AnalyzeSearchResults_FlowInput = { 
       clothingItem: values.clothingItem,
-      colorPreference: values.colorPreference,
+      colorPreference: values.colorPreference || "",
     };
     const result = await performSearch(searchInput);
     setIsLoadingSearch(false);
@@ -68,7 +67,7 @@ export default function StyleSavvyShopperPage() {
     }
   };
 
-  const handleGetAdvice = async (product: Product) => {
+  const handleGetAdvice = async (product: RelevantProduct) => {
     setSelectedProduct(product);
     setSelectedProductIdForLoading(product.productUrl || null);
     setIsLoadingAdvice(true);
