@@ -51,9 +51,10 @@ export async function scrapeShoebySearchResults(
 
     const htmlContent = await response.text();
     
-    if (!htmlContent || htmlContent.trim().length < 200) { 
-        console.warn(`HTML content from ${searchUrl} seems too short or empty. Length: ${htmlContent.length}`);
-    }
+    // Removed length check: if (!htmlContent || htmlContent.trim().length < 200)
+    // This allows "no results" pages or very short valid pages to be passed to the AI.
+    // The AI is responsible for interpreting if products are present or not.
+
     return htmlContent;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -83,3 +84,4 @@ export async function scrapeProductDetails(
   console.warn("scrapeProductDetails is a placeholder. It will not scrape product details for URL:", _productUrl);
   return null;
 }
+
