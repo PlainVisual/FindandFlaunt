@@ -18,20 +18,17 @@ const SafeAnalyzeSearchResultsOutputSchema = z.array(RelevantProductSchema.parti
 
 export async function performSearch(input: AnalyzeSearchResults_FlowInput): Promise<AnalyzeSearchResultsOutput | { error: string }> {
   try {
-    // Validate all required inputs for the new schema
-    if (!input.clothingItem || !input.colorPreference || !input.searchResultsHtml) {
-      return { error: "Clothing Item, Color Preference, and Search Results HTML are required." };
+    // Validate required inputs for the new schema (searchResultsHtml is no longer part of input)
+    if (!input.clothingItem) { // Color preference can be optional if logic allows
+      return { error: "Clothing Item is required." };
     }
-    if (input.searchResultsHtml.length < 100) { // Basic check for HTML content length
-        return { error: "The provided HTML content for search results seems too short. Please ensure you copied the full page source." };
-    }
-
+    // Removed validation for input.searchResultsHtml.length
 
     const results = await analyzeSearchResults(input);
     
     if (!results) {
         console.error("analyzeSearchResults returned null or undefined, expected an array.");
-        return { error: "Failed to analyze search results: AI did not return expected data format."};
+        return { error: "Failed to analyze search results: AI did not return expected data format or scraping failed."};
     }
     
     const validatedResults = SafeAnalyzeSearchResultsOutputSchema.safeParse(results);
@@ -48,9 +45,9 @@ export async function performSearch(input: AnalyzeSearchResults_FlowInput): Prom
 
     if (displayableResults.length === 0) {
         if (results.length > 0) { 
-            return { error: "Products found by AI were missing essential details (like image or link) or did not meet display criteria. Please check the HTML source or try a different search." };
+            return { error: "Products found by AI were missing essential details (like image or link) or did not meet display criteria. The scraping might have been incomplete." };
         }
-        return { error: "No relevant products found in the provided HTML. Please ensure the HTML is correct and contains product listings." };
+        return { error: "No relevant products found after searching Shoeby.nl. Please try different keywords or check if the site is accessible." };
     }
     return displayableResults as AnalyzeSearchResultsOutput; 
   } catch (e) {
@@ -68,7 +65,6 @@ export async function getStylingAdvice(input: ProvideStylingAdviceInput): Promis
      if (!input.itemImageUrl.startsWith('http://') && !input.itemImageUrl.startsWith('https://')) {
         return { error: "Invalid item image URL provided for styling advice. It must start with http:// or https://." };
     }
-
 
     const advice = await provideStylingAdvice(input);
      if (!advice || !advice.stylingAdvice || !advice.outfitImageUrl) {

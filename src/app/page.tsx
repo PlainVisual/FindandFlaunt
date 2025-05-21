@@ -49,10 +49,10 @@ export default function StyleSavvyShopperPage() {
     setCurrentClothingItem(values.clothingItem); 
     setCurrentColorPreference(values.colorPreference); 
 
+    // searchResultsHtml is no longer passed from the form
     const searchInput: AnalyzeSearchResults_FlowInput = { 
       clothingItem: values.clothingItem,
       colorPreference: values.colorPreference,
-      searchResultsHtml: values.searchResultsHtml, // Include the HTML content
     };
     const result = await performSearch(searchInput);
     setIsLoadingSearch(false);
@@ -63,7 +63,7 @@ export default function StyleSavvyShopperPage() {
       setAnalyzedProducts(result);
       setStep('results');
       if (result.length === 0) {
-        toast({ title: "No Products Found", description: "No items matched your search criteria in the provided HTML.", variant: "default" });
+        toast({ title: "No Products Found", description: "No items matched your search on Shoeby.nl or the AI couldn't identify them.", variant: "default" });
       }
     }
   };
@@ -81,7 +81,7 @@ export default function StyleSavvyShopperPage() {
         return;
     }
     
-    if (!product.imageUrl.startsWith('http://') && !product.imageUrl.startsWith('https://')) {
+    if (!product.imageUrl.startsWith('http://') && !product.imageUrl.startsWith('https://') && !product.imageUrl.startsWith('data:')) {
         toast({ title: "Invalid Product Image", description: "The product image URL is not valid.", variant: "destructive" });
         setIsLoadingAdvice(false);
         setSelectedProductIdForLoading(null);
@@ -126,7 +126,7 @@ export default function StyleSavvyShopperPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-1 container mx-auto p-4 md:p-8">
-        {isLoadingSearch && <LoadingSpinner message="Analyzing your provided HTML..." className="my-10" />}
+        {isLoadingSearch && <LoadingSpinner message="Searching Shoeby.nl and analyzing results..." className="my-10" />}
         
         {!isLoadingSearch && (
           <>
