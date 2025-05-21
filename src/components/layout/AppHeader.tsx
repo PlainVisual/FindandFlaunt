@@ -11,8 +11,8 @@ export function AppHeader() {
           <Image
             src="/logoFF.png" // Assuming your logo is in public/logoFF.png
             alt="Find&Flaunt Logo"
-            width={150} // Adjust to your logo's width
-            height={40} // Adjust to your logo's height
+            width={100} // Adjust to your logo's width
+            height={20} // Adjust to your logo's height
             priority // Add priority if the logo is above the fold
           />
           {/* Optional: If you still want the Sparkles icon next to the logo

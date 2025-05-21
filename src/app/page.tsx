@@ -10,7 +10,7 @@ import { AdviceSection } from "@/components/AdviceSection";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { performSearch, getStylingAdvice } from './actions';
 import type { AnalyzeSearchResults_FlowInput, AnalyzeSearchResultsOutput } from '@/ai/flows/analyze-search-results';
-import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
+import type { RelevantProduct } from '@/lib/schemas';
 import type { ProvideStylingAdviceInput, ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
 import type { SearchFormValues } from '@/lib/schemas';
 import { useToast } from "@/hooks/use-toast";
@@ -18,7 +18,7 @@ import { useToast } from "@/hooks/use-toast";
 
 type AppStep = 'input' | 'results' | 'advice';
 
-export default function StyleSavvyShopperPage() {
+export default function FindAndFlauntPage() {
   const [step, setStep] = useState<AppStep>('input');
   const [analyzedProducts, setAnalyzedProducts] = useState<AnalyzeSearchResultsOutput>([]);
   const [selectedProduct, setSelectedProduct] = useState<RelevantProduct | null>(null);
@@ -57,12 +57,12 @@ export default function StyleSavvyShopperPage() {
     setIsLoadingSearch(false);
 
     if ('error' in result) {
-      toast({ title: "Search Error", description: result.error, variant: "destructive" });
+      toast({ title: "Zoekfout", description: result.error, variant: "destructive" });
     } else {
       setAnalyzedProducts(result);
       setStep('results');
       if (result.length === 0) {
-        toast({ title: "No Products Found", description: "No items matched your search on Shoeby.nl or the AI couldn't identify them.", variant: "default" });
+        toast({ title: "Geen Producten Gevonden", description: "Geen items kwamen overeen met je zoekopdracht op Shoeby.nl of de AI kon ze niet identificeren.", variant: "default" });
       }
     }
   };
@@ -74,22 +74,22 @@ export default function StyleSavvyShopperPage() {
     setStylingAdvice(null);
 
     if (!product.imageUrl || !product.description) {
-        toast({ title: "Missing Product Info", description: "Cannot get advice for products with missing image or description.", variant: "destructive" });
+        toast({ title: "Missende Productinformatie", description: "Kan geen advies krijgen voor producten met ontbrekende afbeelding of beschrijving.", variant: "destructive" });
         setIsLoadingAdvice(false);
         setSelectedProductIdForLoading(null);
         return;
     }
     
     if (!product.imageUrl.startsWith('http://') && !product.imageUrl.startsWith('https://') && !product.imageUrl.startsWith('data:')) {
-        toast({ title: "Invalid Product Image", description: "The product image URL is not valid.", variant: "destructive" });
+        toast({ title: "Ongeldige Productafbeelding", description: "De URL van de productafbeelding is niet geldig.", variant: "destructive" });
         setIsLoadingAdvice(false);
         setSelectedProductIdForLoading(null);
         return;
     }
 
     const adviceInput: ProvideStylingAdviceInput = {
-      clothingItem: currentClothingItem || product.title || "clothing", 
-      colorPreference: currentColorPreference || "any", 
+      clothingItem: currentClothingItem || product.title || "kledingstuk", 
+      colorPreference: currentColorPreference || "elke kleur", 
       itemDescription: product.description,
       itemImageUrl: product.imageUrl,
     };
@@ -99,7 +99,7 @@ export default function StyleSavvyShopperPage() {
     setSelectedProductIdForLoading(null);
 
     if ('error' in result) {
-      toast({ title: "Styling Error", description: result.error, variant: "destructive" });
+      toast({ title: "Stijladvies Fout", description: result.error, variant: "destructive" });
     } else {
       setStylingAdvice(result);
       setStep('advice');
@@ -124,8 +124,8 @@ export default function StyleSavvyShopperPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
-      <main className="flex-1 container mx-auto p-4 md:p-8">
-        {isLoadingSearch && <LoadingSpinner message="Searching Shoeby.nl and analyzing results..." className="my-10" />}
+      <main className="flex flex-1 flex-col md:justify-center container mx-auto p-4 md:p-8">
+        {isLoadingSearch && <LoadingSpinner message="Shoeby.nl aan het doorzoeken en resultaten aan het analyseren..." className="my-10" />}
         
         {!isLoadingSearch && (
           <>

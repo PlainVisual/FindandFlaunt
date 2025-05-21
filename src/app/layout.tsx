@@ -5,7 +5,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'StyleSavvy Shopper',
+  title: 'Find&Flaunt',
   description: 'Your personal AI style advisor for Shoeby.nl finds.',
 };
 

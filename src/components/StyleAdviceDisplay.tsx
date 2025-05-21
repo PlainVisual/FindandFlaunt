@@ -63,7 +63,7 @@ export function StyleAdviceDisplay({ originalProduct, advice }: StyleAdviceDispl
         <CardHeader>
           <CardTitle className="text-xl flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-accent" />
-            StyleSavvy Advice
+            Find&Flaunt Advice
           </CardTitle>
           <CardDescription>Personalized styling tips for your chosen item.</CardDescription>
         </CardHeader>
