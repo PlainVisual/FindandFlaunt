@@ -9,7 +9,7 @@ export function AppHeader() {
         <Link href="/" className="flex items-center gap-2 text-xl md:text-2xl font-bold text-primary hover:opacity-80 transition-opacity">
           {/* Replace with your logo */}
           <Image
-            src="/logo.png" // Assuming your logo is in public/logo.png
+            src="/logoFF.png" // Assuming your logo is in public/logoFF.png
             alt="Find&Flaunt Logo"
             width={150} // Adjust to your logo's width
             height={40} // Adjust to your logo's height
