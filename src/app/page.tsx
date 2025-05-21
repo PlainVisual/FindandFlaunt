@@ -9,7 +9,7 @@ import { ResultsSection } from "@/components/ResultsSection";
 import { AdviceSection } from "@/components/AdviceSection";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { performSearch, getStylingAdvice } from './actions';
-import type { AnalyzeSearchResultsInput, AnalyzeSearchResultsOutput, RelevantProductSchema } from '@/ai/flows/analyze-search-results';
+import type { AnalyzeSearchResults_FlowInput, AnalyzeSearchResultsOutput, RelevantProductSchema } from '@/ai/flows/analyze-search-results'; // Updated import
 import type { ProvideStylingAdviceInput, ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
 import type { SearchFormValues } from '@/lib/schemas';
 import { useToast } from "@/hooks/use-toast";
@@ -52,10 +52,10 @@ export default function StyleSavvyShopperPage() {
     setCurrentClothingItem(values.clothingItem); // Store for styling advice
     setCurrentColorPreference(values.colorPreference); // Store for styling advice
 
-    const searchInput: AnalyzeSearchResultsInput = {
+    const searchInput: AnalyzeSearchResults_FlowInput = { // Updated type
       clothingItem: values.clothingItem,
       colorPreference: values.colorPreference,
-      searchResults: values.searchResultsHtml,
+      // searchResultsHtml removed
     };
     const result = await performSearch(searchInput);
     setIsLoadingSearch(false);
@@ -66,7 +66,9 @@ export default function StyleSavvyShopperPage() {
       setAnalyzedProducts(result);
       setStep('results');
       if (result.length === 0) {
-        toast({ title: "No Products Found", description: "Try refining your search criteria or HTML input.", variant: "default" });
+        // This specific message might be redundant if performSearch already returns a more specific "No products found" error.
+        // However, keeping a general fallback here can be useful.
+        toast({ title: "No Products Found", description: "No items matched your search criteria or issues encountered during search.", variant: "default" });
       }
     }
   };
@@ -83,6 +85,15 @@ export default function StyleSavvyShopperPage() {
         setSelectedProductIdForLoading(null);
         return;
     }
+    
+    // Basic check for a valid URL structure.
+    if (!product.imageUrl.startsWith('http://') && !product.imageUrl.startsWith('https://')) {
+        toast({ title: "Invalid Product Image", description: "The product image URL is not valid.", variant: "destructive" });
+        setIsLoadingAdvice(false);
+        setSelectedProductIdForLoading(null);
+        return;
+    }
+
 
     const adviceInput: ProvideStylingAdviceInput = {
       clothingItem: currentClothingItem || product.title || "clothing", // Fallback for clothing item
@@ -122,7 +133,7 @@ export default function StyleSavvyShopperPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-1 container mx-auto p-4 md:p-8">
-        {isLoadingSearch && <LoadingSpinner message="Searching for stylish items..." className="my-10" />}
+        {isLoadingSearch && <LoadingSpinner message="Searching Shoeby.nl for stylish items..." className="my-10" />}
         {/* Note: isLoadingAdvice is handled within ProductCard for individual loading states */}
         
         {!isLoadingSearch && (

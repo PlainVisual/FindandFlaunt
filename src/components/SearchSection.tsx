@@ -7,11 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SearchFormSchema, type SearchFormValues } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+// Textarea removed
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Info, Palette, Search, Shirt } from "lucide-react";
+import { Palette, Search, Shirt } from "lucide-react"; // Info icon removed
 
 interface SearchSectionProps {
   onSubmit: (values: SearchFormValues) => Promise<void>;
@@ -24,7 +24,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
     defaultValues: {
       clothingItem: "",
       colorPreference: "",
-      searchResultsHtml: "",
+      // searchResultsHtml removed
     },
   });
 
@@ -40,7 +40,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
           Find Your Style
         </CardTitle>
         <CardDescription>
-          Enter your clothing preferences and paste Shoeby.nl search results HTML to get started.
+          Enter your clothing preferences, and we'll search Shoeby.nl for you.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -72,26 +72,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="searchResultsHtml"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Info className="h-4 w-4" />Shoeby.nl Search Results HTML</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Paste the HTML content of a Shoeby.nl search results page here."
-                      className="min-h-[200px] text-sm"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    To get HTML: On Shoeby.nl, search for items. Right-click page -> View Page Source. Copy all content.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {/* FormField for searchResultsHtml removed */}
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isLoading}>
