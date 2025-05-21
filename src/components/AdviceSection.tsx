@@ -19,7 +19,7 @@ export function AdviceSection({ product, advice, onResetToInput, onResetToResult
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h2 className="text-2xl font-semibold">Your Style Advice</h2>
+        <h2 className="text-2xl font-display font-semibold">Your Style Advice</h2>
         <div className="flex gap-2">
           <Button onClick={onResetToResults} variant="outline">
             <ArrowLeft className="mr-2 h-4 w-4" />

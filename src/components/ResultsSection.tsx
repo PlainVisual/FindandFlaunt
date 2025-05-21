@@ -32,7 +32,7 @@ export function ResultsSection({ products, onSelectProduct, onReset, isLoadingAd
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-        <h2 className="text-2xl font-semibold">Search Results ({products.length})</h2>
+        <h2 className="text-2xl font-display font-semibold">Search Results ({products.length})</h2>
         <Button onClick={onReset} variant="outline">
           <ArrowLeft className="mr-2 h-4 w-4" />
           New Search
