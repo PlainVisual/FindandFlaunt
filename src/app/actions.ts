@@ -18,15 +18,17 @@ const SafeAnalyzeSearchResultsOutputSchema = z.array(RelevantProductSchema.parti
 
 export async function performSearch(input: AnalyzeSearchResults_FlowInput): Promise<AnalyzeSearchResultsOutput | { error: string }> {
   try {
-    // Removed validation for input.searchResults
-    if (!input.clothingItem || !input.colorPreference) {
-      return { error: "Clothing Item and Color Preference are required." };
+    // Validate all required inputs for the new schema
+    if (!input.clothingItem || !input.colorPreference || !input.searchResultsHtml) {
+      return { error: "Clothing Item, Color Preference, and Search Results HTML are required." };
     }
+    if (input.searchResultsHtml.length < 100) { // Basic check for HTML content length
+        return { error: "The provided HTML content for search results seems too short. Please ensure you copied the full page source." };
+    }
+
 
     const results = await analyzeSearchResults(input);
     
-    // It's possible results could be null if the prompt somehow failed to return an array,
-    // though the flow now ensures an array is returned.
     if (!results) {
         console.error("analyzeSearchResults returned null or undefined, expected an array.");
         return { error: "Failed to analyze search results: AI did not return expected data format."};
@@ -36,33 +38,24 @@ export async function performSearch(input: AnalyzeSearchResults_FlowInput): Prom
 
     if (!validatedResults.success) {
       console.error("Validation failed for analyzeSearchResults:", validatedResults.error.issues);
-      // Provide a more user-friendly message if AI output is malformed
       const issueMessages = validatedResults.error.issues.map(issue => `${issue.path.join('.')} - ${issue.message}`).join('; ');
       return { error: `Received malformed product data from AI. Details: ${issueMessages}. Please try again.` };
     }
     
-    // Filter out products that don't have a valid image URL or product URL for better UX
     const displayableResults = validatedResults.data.filter(
         product => product.imageUrl && product.productUrl && product.title !== "Untitled Product"
     );
 
-    // Check if displayableResults is empty *after* filtering.
-    // The original `results` from AI might have items, but they might all be filtered out.
     if (displayableResults.length === 0) {
-        if (results.length > 0) { // AI found items, but they were filtered out
-            return { error: "Products found by AI were missing essential details (like image or link). Please try a different search." };
+        if (results.length > 0) { 
+            return { error: "Products found by AI were missing essential details (like image or link) or did not meet display criteria. Please check the HTML source or try a different search." };
         }
-        // AI itself returned no items (or scraping failed and flow returned empty)
-        return { error: "No relevant products found. The website might not have matching items, or there was an issue fetching them. Try adjusting your search." };
+        return { error: "No relevant products found in the provided HTML. Please ensure the HTML is correct and contains product listings." };
     }
-    return displayableResults as AnalyzeSearchResultsOutput; // Cast back after ensuring essential fields
+    return displayableResults as AnalyzeSearchResultsOutput; 
   } catch (e) {
     console.error("Error in performSearch:", e);
     const errorMessage = e instanceof Error ? e.message : "An unknown error occurred";
-    // Check if the error message indicates a scraping failure or specific AI issue.
-    if (errorMessage.toLowerCase().includes("scrape") || errorMessage.toLowerCase().includes("fetch")) {
-        return { error: `Failed to retrieve product data from Shoeby.nl: ${errorMessage}. Please check your connection or try again later.` };
-    }
     return { error: `Failed to analyze search results: ${errorMessage}. Please try again.` };
   }
 }
@@ -72,7 +65,6 @@ export async function getStylingAdvice(input: ProvideStylingAdviceInput): Promis
     if (!input.clothingItem || !input.colorPreference || !input.itemDescription || !input.itemImageUrl) {
         return { error: "All product details (clothing item, color, description, image URL) are required for styling advice." };
     }
-     // Basic check for a valid URL structure.
      if (!input.itemImageUrl.startsWith('http://') && !input.itemImageUrl.startsWith('https://')) {
         return { error: "Invalid item image URL provided for styling advice. It must start with http:// or https://." };
     }
@@ -82,7 +74,6 @@ export async function getStylingAdvice(input: ProvideStylingAdviceInput): Promis
      if (!advice || !advice.stylingAdvice || !advice.outfitImageUrl) {
         return { error: "Could not generate styling advice for this item. The AI might be unable to process the request." };
     }
-    // Check if AI generated outfit image URL is a data URI or http/https URL
     if (!advice.outfitImageUrl.startsWith('data:image/') && !advice.outfitImageUrl.startsWith('http')) {
         return { error: "AI generated an invalid outfit image URL. It should be a data URI or a web URL." };
     }

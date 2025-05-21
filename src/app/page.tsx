@@ -9,7 +9,7 @@ import { ResultsSection } from "@/components/ResultsSection";
 import { AdviceSection } from "@/components/AdviceSection";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { performSearch, getStylingAdvice } from './actions';
-import type { AnalyzeSearchResults_FlowInput, AnalyzeSearchResultsOutput, RelevantProductSchema } from '@/ai/flows/analyze-search-results'; // Updated import
+import type { AnalyzeSearchResults_FlowInput, AnalyzeSearchResultsOutput, RelevantProductSchema } from '@/ai/flows/analyze-search-results';
 import type { ProvideStylingAdviceInput, ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
 import type { SearchFormValues } from '@/lib/schemas';
 import { useToast } from "@/hooks/use-toast";
@@ -23,7 +23,6 @@ export default function StyleSavvyShopperPage() {
   const [analyzedProducts, setAnalyzedProducts] = useState<AnalyzeSearchResultsOutput>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   
-  // Store original search inputs for styling advice
   const [currentClothingItem, setCurrentClothingItem] = useState<string>("");
   const [currentColorPreference, setCurrentColorPreference] = useState<string>("");
 
@@ -36,10 +35,8 @@ export default function StyleSavvyShopperPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Clear states if user navigates back using browser buttons (simplified example)
     const handlePopState = () => {
-      // This is a naive reset, a more sophisticated router-based approach might be needed
-      // For simple step-based SPA, this might not be necessary or could be handled by step state
+      // Handle browser back/forward navigation if needed
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -47,15 +44,15 @@ export default function StyleSavvyShopperPage() {
 
   const handleSearchSubmit = async (values: SearchFormValues) => {
     setIsLoadingSearch(true);
-    setAnalyzedProducts([]); // Clear previous results
+    setAnalyzedProducts([]); 
 
-    setCurrentClothingItem(values.clothingItem); // Store for styling advice
-    setCurrentColorPreference(values.colorPreference); // Store for styling advice
+    setCurrentClothingItem(values.clothingItem); 
+    setCurrentColorPreference(values.colorPreference); 
 
-    const searchInput: AnalyzeSearchResults_FlowInput = { // Updated type
+    const searchInput: AnalyzeSearchResults_FlowInput = { 
       clothingItem: values.clothingItem,
       colorPreference: values.colorPreference,
-      // searchResultsHtml removed
+      searchResultsHtml: values.searchResultsHtml, // Include the HTML content
     };
     const result = await performSearch(searchInput);
     setIsLoadingSearch(false);
@@ -66,16 +63,14 @@ export default function StyleSavvyShopperPage() {
       setAnalyzedProducts(result);
       setStep('results');
       if (result.length === 0) {
-        // This specific message might be redundant if performSearch already returns a more specific "No products found" error.
-        // However, keeping a general fallback here can be useful.
-        toast({ title: "No Products Found", description: "No items matched your search criteria or issues encountered during search.", variant: "default" });
+        toast({ title: "No Products Found", description: "No items matched your search criteria in the provided HTML.", variant: "default" });
       }
     }
   };
 
   const handleGetAdvice = async (product: Product) => {
     setSelectedProduct(product);
-    setSelectedProductIdForLoading(product.productUrl || null); // Assuming productUrl is unique
+    setSelectedProductIdForLoading(product.productUrl || null);
     setIsLoadingAdvice(true);
     setStylingAdvice(null);
 
@@ -86,7 +81,6 @@ export default function StyleSavvyShopperPage() {
         return;
     }
     
-    // Basic check for a valid URL structure.
     if (!product.imageUrl.startsWith('http://') && !product.imageUrl.startsWith('https://')) {
         toast({ title: "Invalid Product Image", description: "The product image URL is not valid.", variant: "destructive" });
         setIsLoadingAdvice(false);
@@ -94,10 +88,9 @@ export default function StyleSavvyShopperPage() {
         return;
     }
 
-
     const adviceInput: ProvideStylingAdviceInput = {
-      clothingItem: currentClothingItem || product.title || "clothing", // Fallback for clothing item
-      colorPreference: currentColorPreference || "any", // Fallback for color
+      clothingItem: currentClothingItem || product.title || "clothing", 
+      colorPreference: currentColorPreference || "any", 
       itemDescription: product.description,
       itemImageUrl: product.imageUrl,
     };
@@ -133,8 +126,7 @@ export default function StyleSavvyShopperPage() {
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
       <main className="flex-1 container mx-auto p-4 md:p-8">
-        {isLoadingSearch && <LoadingSpinner message="Searching Shoeby.nl for stylish items..." className="my-10" />}
-        {/* Note: isLoadingAdvice is handled within ProductCard for individual loading states */}
+        {isLoadingSearch && <LoadingSpinner message="Analyzing your provided HTML..." className="my-10" />}
         
         {!isLoadingSearch && (
           <>

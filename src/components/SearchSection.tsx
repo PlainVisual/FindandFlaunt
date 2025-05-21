@@ -7,11 +7,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SearchFormSchema, type SearchFormValues } from "@/lib/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-// Textarea removed
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Palette, Search, Shirt } from "lucide-react"; // Info icon removed
+import { Palette, Search, Shirt, FileText } from "lucide-react";
 
 interface SearchSectionProps {
   onSubmit: (values: SearchFormValues) => Promise<void>;
@@ -24,7 +24,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
     defaultValues: {
       clothingItem: "",
       colorPreference: "",
-      // searchResultsHtml removed
+      searchResultsHtml: "",
     },
   });
 
@@ -40,7 +40,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
           Find Your Style
         </CardTitle>
         <CardDescription>
-          Enter your clothing preferences, and we'll search Shoeby.nl for you.
+          Enter your clothing preferences and paste the HTML content from Shoeby.nl search results.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -72,7 +72,26 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
                 </FormItem>
               )}
             />
-            {/* FormField for searchResultsHtml removed */}
+            <FormField
+              control={form.control}
+              name="searchResultsHtml"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex items-center gap-2"><FileText className="h-4 w-4" />Shoeby.nl Search Results HTML</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Paste the HTML content of the search results page here..."
+                      className="min-h-[150px]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Go to Shoeby.nl, search for items, then right-click on the page, select "View Page Source", and copy-paste the entire content here.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isLoading}>
@@ -82,10 +101,10 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Searching...
+                  Analyzing Results...
                 </>
               ) : (
-                "Search for Products"
+                "Analyze Search Results"
               )}
             </Button>
           </CardFooter>
