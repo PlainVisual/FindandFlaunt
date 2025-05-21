@@ -7,15 +7,34 @@ import { provideStylingAdvice, type ProvideStylingAdviceInput, type ProvideStyli
 import { RelevantProductSchema } from '@/lib/schemas';
 import { z } from "zod";
 
+// Custom Zod schema to safely parse a string as a URL.
+// If it's a valid URL, it's returned. Otherwise, it's treated as an empty string.
+// It also defaults to an empty string if undefined.
+const SafeUrlStringSchema = z.preprocess((val) => {
+  if (typeof val === 'string') {
+    // Trim whitespace which can invalidate URLs
+    return val.trim();
+  }
+  return val; // Pass other types (like undefined) through for further Zod processing
+}, z.string().transform((val) => {
+    if (val === "") return ""; // Allow explicitly empty string
+    const urlCheck = z.string().url().safeParse(val);
+    return urlCheck.success ? urlCheck.data : ""; // If not a valid URL, coerce to empty string
+  }).optional().default("")
+);
+
+
 // Helper to validate results from AI flow for analyzeSearchResults
-const SafeAnalyzeSearchResultsOutputSchema = z.array(RelevantProductSchema.partial().extend({
-  relevanceScore: z.number().min(0).max(1).default(0.5),
-  imageUrl: z.string().url().optional().or(z.literal("")),
-  title: z.string().default("Untitled Product"),
-  description: z.string().default("No description available."),
-  price: z.string().default("Price not specified"),
-  productUrl: z.string().url().optional().or(z.literal("")),
-}));
+const SafeAnalyzeSearchResultsOutputSchema = z.array(
+  RelevantProductSchema.partial().extend({
+    relevanceScore: z.number().min(0).max(1).optional().default(0.5), // Made optional before default
+    imageUrl: SafeUrlStringSchema,
+    title: z.string().optional().default("Untitled Product"), // Made optional before default
+    description: z.string().optional().default("No description available."), // Made optional before default
+    price: z.string().optional().default("Price not specified"), // Made optional before default
+    productUrl: SafeUrlStringSchema,
+  })
+);
 
 
 export async function performSearch(input: AnalyzeSearchResults_FlowInput): Promise<AnalyzeSearchResultsOutput | { error: string }> {
@@ -26,7 +45,6 @@ export async function performSearch(input: AnalyzeSearchResults_FlowInput): Prom
 
     const results = await analyzeSearchResults(input);
 
-    // If the flow itself fails to return an array (e.g., returns null/undefined unexpectedly)
     if (!Array.isArray(results)) {
         console.error("analyzeSearchResults did not return an array. Received:", results);
         return { error: "Failed to analyze search results: The AI service returned an unexpected data structure. Please check service status or try again."};
@@ -39,23 +57,31 @@ export async function performSearch(input: AnalyzeSearchResults_FlowInput): Prom
       const issueMessages = validatedResults.error.issues.map(issue => `${issue.path.join('.')} - ${issue.message}`).join('; ');
       return { error: `Received malformed product data from AI. Details: ${issueMessages}. Please try again.` };
     }
-
+    
+    // Filter out products that don't have essential displayable information after parsing & defaulting
     const displayableResults = validatedResults.data.filter(
         product => product.imageUrl && product.productUrl && product.title !== "Untitled Product"
     );
 
     if (displayableResults.length === 0) {
-        if (results.length > 0) { // Products were found but filtered out due to missing essential details
-            return { error: "Products found by AI were missing essential details (like image or link) or did not meet display criteria. The scraping might have been incomplete or the AI's extraction was partial." };
+        // This condition means either AI found nothing, or what it found was unusable (e.g. no valid URLs after parsing)
+        let specificMessage = "No relevant products found after searching Shoeby.nl and processing the results.";
+        if (results.length > 0 && validatedResults.data.length > 0) {
+            // AI found items, but they didn't meet display criteria (e.g., missing URL/image after our safe parsing)
+            specificMessage = "Products found by AI were missing essential details (like image or link) or did not meet display criteria after processing. The scraping might have been incomplete or the AI's extraction was partial.";
+        } else if (results.length === 0) {
+            // AI itself returned an empty list
+            specificMessage = "No products were identified by the AI from the Shoeby.nl search results. The item might not be available, or there could be a temporary issue accessing Shoeby.nl.";
         }
-        // This message is shown if scraping fails (results=[]) or no relevant products are found by the AI.
-        return { error: "No relevant products found after searching Shoeby.nl. This could be due to the item not being available, a temporary issue with accessing Shoeby.nl, or the AI not finding matches in the content. Please try different keywords or check back later." };
+        return { error: specificMessage };
     }
+    // Cast is safe here because displayableResults are filtered to have required fields.
+    // And SafeAnalyzeSearchResultsOutputSchema ensures other fields match RelevantProduct or have defaults.
     return displayableResults as AnalyzeSearchResultsOutput;
+
   } catch (e) {
     console.error("Error in performSearch:", e);
     const errorMessage = e instanceof Error ? e.message : "An unknown error occurred";
-    // This message covers errors from the Genkit call itself (e.g. API errors from Google AI, flow execution errors)
     return { error: `An error occurred while trying to fetch or analyze search results: ${errorMessage}. Please ensure your AI service is configured correctly, check logs, and try again.` };
   }
 }

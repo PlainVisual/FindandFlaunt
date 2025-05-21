@@ -8,11 +8,11 @@ export const SearchFormSchema = z.object({
 export type SearchFormValues = z.infer<typeof SearchFormSchema>;
 
 export const RelevantProductSchema = z.object({
-  imageUrl: z.string().describe('URL of the product image.'),
+  imageUrl: z.string().optional().describe('URL of the product image. Should be a valid URL if provided, otherwise can be omitted.'),
   title: z.string().describe('Title of the product.'),
   description: z.string().describe('Short description of the product.'),
   price: z.string().describe('Price of the product.'),
-  productUrl: z.string().describe('URL to the product page on Shoeby.nl.'),
+  productUrl: z.string().optional().describe('URL to the product page on Shoeby.nl. Should be a valid URL if provided, otherwise can be omitted.'),
   relevanceScore: z.number().describe('A numerical score (0-1) indicating how well the product matches the user preferences, with 1 being a perfect match.')
 });
 export type RelevantProduct = z.infer<typeof RelevantProductSchema>;
