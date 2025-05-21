@@ -53,7 +53,8 @@ export async function performSearch(input: AnalyzeSearchResults_FlowInput): Prom
     const validatedResults = SafeAnalyzeSearchResultsOutputSchema.safeParse(results);
 
     if (!validatedResults.success) {
-      console.error("Validation failed for analyzeSearchResults:", validatedResults.error.issues);
+      console.error("Validation failed for analyzeSearchResults. Issues:", validatedResults.error.issues);
+      console.error("Raw AI results causing validation failure:", JSON.stringify(results, null, 2)); // Added for detailed logging
       const issueMessages = validatedResults.error.issues.map(issue => `${issue.path.join('.')} - ${issue.message}`).join('; ');
       return { error: `Received malformed product data from AI. Details: ${issueMessages}. Please try again.` };
     }
