@@ -35,12 +35,12 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
     <Card className="w-full max-w-4xl mx-auto shadow-xl flex flex-col md:flex-row overflow-hidden">
       <div className="w-full md:w-1/3 relative min-h-[200px] md:min-h-0">
         <Image
-          src="https://placehold.co/400x600.png"
-          alt="Fashion inspiration"
+          src="/find-flaunt.png" 
+          alt="Find&Flaunt fashion inspiration"
           fill
           style={{ objectFit: "cover" }}
           className="md:rounded-l-lg md:rounded-r-none rounded-t-lg"
-          data-ai-hint="fashion model"
+          priority
         />
       </div>
       <div className="w-full md:w-2/3 flex flex-col">
