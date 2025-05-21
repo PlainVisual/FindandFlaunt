@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ExternalLink, Shirt, Sparkles } from 'lucide-react';
-import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
+import type { RelevantProduct } from '@/lib/schemas';
 import type { ProvideStylingAdviceOutput } from '@/ai/flows/provide-styling-advice';
 
 
@@ -34,8 +34,9 @@ export function StyleAdviceDisplay({ originalProduct, advice }: StyleAdviceDispl
             <Image
               src={originalProduct.imageUrl || placeholderImage}
               alt={originalProduct.title || "Original product"}
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optional: Add sizes
               data-ai-hint="fashion clothing"
               onError={(e) => (e.currentTarget.src = placeholderImage)}
             />
@@ -71,8 +72,9 @@ export function StyleAdviceDisplay({ originalProduct, advice }: StyleAdviceDispl
              <Image
               src={advice.outfitImageUrl || placeholderImage}
               alt="AI generated outfit"
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optional: Add sizes
               data-ai-hint="fashion model outfit"
               onError={(e) => (e.currentTarget.src = placeholderImage)}
             />

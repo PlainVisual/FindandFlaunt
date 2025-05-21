@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from 'lucide-react';
-import type { RelevantProduct } from '@/lib/schemas'; // Updated import path
+import type { RelevantProduct } from '@/lib/schemas';
 
 
 interface ProductCardProps {
@@ -27,8 +27,9 @@ export function ProductCard({ product, onGetAdvice, isLoadingAdvice, selectedPro
           <Image
             src={product.imageUrl || placeholderImage}
             alt={product.title || "Product image"}
-            layout="fill"
-            objectFit="cover"
+            fill
+            style={{ objectFit: 'cover' }}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" // Optional: Add sizes for better performance
             className="transition-transform duration-300 group-hover:scale-105"
             data-ai-hint="fashion clothing"
             onError={(e) => (e.currentTarget.src = placeholderImage)}
