@@ -32,7 +32,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto shadow-xl flex flex-col md:flex-row overflow-hidden">
+    <Card className="w-full max-w-4xl mx-auto shadow-xl flex flex-col md:flex-row overflow-hidden md:min-h-[600px]">
       <div className="w-full md:w-1/3 relative min-h-[200px] md:min-h-0">
         <Image
           src="/find-flaunt.png" 
@@ -43,7 +43,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
           priority
         />
       </div>
-      <div className="w-full md:w-2/3 flex flex-col">
+      <div className="w-full md:w-2/3 flex flex-col flex-grow">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2 font-display">
             <Search className="h-6 w-6 text-primary" />
