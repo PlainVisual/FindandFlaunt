@@ -43,7 +43,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
           priority
         />
       </div>
-      <div className="w-full md:w-2/3 flex flex-col flex-grow md:justify-center">
+      <div className="w-full md:w-2/3 flex flex-col flex-grow md:justify-center px-2 md:px-8 lg:px-12">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2 font-display">
             <Search className="h-6 w-6 text-primary" />
