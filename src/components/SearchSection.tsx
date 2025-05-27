@@ -43,7 +43,7 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
           priority
         />
       </div>
-      <div className="w-full md:w-2/3 flex flex-col flex-grow">
+      <div className="w-full md:w-2/3 flex flex-col flex-grow md:justify-center">
         <CardHeader>
           <CardTitle className="text-2xl flex items-center gap-2 font-display">
             <Search className="h-6 w-6 text-primary" />
@@ -54,8 +54,8 @@ export function SearchSection({ onSubmit, isLoading }: SearchSectionProps) {
           </CardDescription>
         </CardHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col flex-grow">
-            <CardContent className="space-y-6 flex-grow">
+          <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col">
+            <CardContent className="space-y-6">
               <FormField
                 control={form.control}
                 name="clothingItem"
