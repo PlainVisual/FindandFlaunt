@@ -124,7 +124,7 @@ export default function FindAndFlauntPage() {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <AppHeader />
-      <main className="flex flex-1 flex-col md:justify-center container mx-auto p-4 md:p-8">
+      <main className="flex flex-1 flex-col md:justify-center container mx-auto py-4 px-6 md:py-8 md:px-12">
         {isLoadingSearch && <LoadingSpinner message="Shoeby.nl aan het doorzoeken en resultaten aan het analyseren..." className="my-10" />}
         
         {!isLoadingSearch && (
